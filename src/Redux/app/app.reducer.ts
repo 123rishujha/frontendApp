@@ -37,7 +37,21 @@ export const AppReducer = (state:IAppstate = initialstate,action: AppAction) =>{
                 loading:false,
                 data : action.payload,
             }
-        }        
+        }    
+        
+        case types.UPDATE_PRODUCT_SUCCESS : {
+            return {
+                ...state,
+                loading:false,
+                data: state.data.map((elem)=>{
+                    if(elem.id===action.payload.id){
+                        elem.title = action.payload.title;
+                        elem.price = action.payload.price;
+                    }
+                    return elem;
+                })
+            }
+        }
 
         default : {
             return state;
