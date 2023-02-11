@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom';
   
 
   
-  function ProductCart({id,title,price,image}:Product) {
+  function ProductCard({id,title,price,image}:Product) {
     return (
       <Flex p={50} w="fit-content" alignItems="center" justifyContent="center">
         <Box
@@ -81,4 +81,4 @@ import { Link } from 'react-router-dom';
     );
   }
   
-  export default ProductCart;
+  export default ProductCard;

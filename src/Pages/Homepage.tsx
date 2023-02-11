@@ -1,62 +1,68 @@
-import { Flex ,Box} from '@chakra-ui/react';
-import {useEffect} from 'react'; 
+import { Box, Flex } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom';
 import FilterAndSort from '../Components/FilterAndSort';
-import ProductCart from '../Components/ProductCart';
+import Pagination from '../Components/Pagination';
+// import ProductCard from '../Component/ProductCard';
+import ProductCard from '../Components/ProductCard';
 import { getProducts } from '../Redux/app/app.action';
 import { useAppDispatch, useAppSelector } from '../Redux/store';
-import { useLocation, useSearchParams } from 'react-router-dom';
 
-const Homepage = () =>{
-    const dispatch = useAppDispatch()
-    const products = useAppSelector((store)=>store.AppReducer.data);
-    const location = useLocation();
-    // conosle.log(location)
-    const [searchParams] = useSearchParams();
 
-    useEffect(()=>{
-        if(products.length===0 || location){
-            const getproductsParam = {
-                params:{
-                    category: searchParams.getAll("filter"),
+const Homepage = () => {
+    const dispatch = useAppDispatch();
+    const products = useAppSelector((store) => store.AppReducer.data)
+    const [searchParams] = useSearchParams()
+    const location = useLocation()
+    const [activePage, setActivePage] = useState(1)
+
+    const handlePageChange = (newPageNumber: number): void => {
+        setActivePage(newPageNumber)
+    }
+
+    // const customFilter = (item, index) => {  
+    //         //searchParams.getAll('filter).includes(item.category) 
+    // }
+
+    useEffect(() => {
+        if(products.length === 0 || location){  
+            const getProductsParam = {
+                params: {
+                    category: searchParams.getAll('filter')
+                    // _sort: "price",
+                    // _order: 
                 }
             }
-            dispatch(getProducts(getproductsParam));
+            dispatch(getProducts(getProductsParam))
         }
-    },[location.search]);
+    },[location.search])
+ 
+  return (
+    <div>
+        <Flex>
+        <Box minW='300px'>
+            <FilterAndSort />
+        </Box>
+        <Box>
 
-    // console.log("homepage-products",products);
+       
+        <Flex flexWrap={'wrap'} justifyContent={'center'}>
+        {products.length > 0 && products.filter((item, index) => {
+        // taking 2 -> denoting products perPage
+         return index >= 2 * (activePage - 1) && index < 2 * activePage
+        }).map(item => {
+            return <ProductCard key={item.id} {...item} />
+        })}
+        </Flex>
+        <Flex justifyContent="center" p={6}>
 
-    return (
-        <div>
-            <Flex>
-                <Box minW="300px">
-                    <FilterAndSort />
-                </Box>
-                <Flex flexWrap={'wrap'} justifyContent='center'>
+        <Pagination productsLength={products?.length}
+        perPage={2} activePage={activePage} handlePageChange={handlePageChange}/>
+        </Flex>
+        </Box>
+        </Flex>
+    </div>
+  )
+}
 
-                    {/*
-                     {
-                        products.length>0 && products.filter((item,index)=>{
-                            searchParams.getAll("filter").includes(item.category)
-                        }).map((item)=>{
-                          return <ProductCart key={item.id} {...item} />
-                        })
-                    } 
-                    */}
-
-                    {
-                        products.length>0 && products.map((item)=>{
-                          return <ProductCart key={item.id} {...item} />
-                        })
-                    }
-                </Flex>
-            </Flex>
-        </div>
-    )
-
-}   
-
-
-export default Homepage;
-
-
+export default Homepage
